@@ -1,0 +1,29 @@
+services:
+  ktor:
+    build: .
+    platform: linux/amd64
+    container_name: fr-faq-service
+    restart: always
+    env_file:
+      - frFaq.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    build:
+      context: ./Docker
+      dockerfile: db.Dockerfile
+    platform: linux/amd64
+    restart: always
+    container_name: fr-faq-db
+    volumes:
+      - pg-volume:/var/lib/postgresql/data
+    env_file:
+      - frFaq.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -p 5432 -d fr_faq_db -U frFaqService" ]§
+      interval: 3s
+volumes:
+  pg-volume: { }

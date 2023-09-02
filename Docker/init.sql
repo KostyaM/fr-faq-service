@@ -1,0 +1,4 @@
+CREATE USER frFaqService;
+
+CREATE DATABASE fr_faq_db;
+GRANT ALL PRIVILEGES ON DATABASE fr_faq_db TO frFaqService;
