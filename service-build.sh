@@ -1,3 +1,2 @@
 docker compose build
-docker compose up -d
-echo | docker compose ps
+/bin/bash service-restart.sh
