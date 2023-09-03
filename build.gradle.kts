@@ -5,6 +5,7 @@ val logback_version: String by project
 val postgres_version: String by project
 val jooq_version: String by project
 val jackson_version: String by project
+val koin_version: String by project
 
 
 plugins {
@@ -38,6 +39,10 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_version")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
+
+    // DI
+    implementation( "io.insert-koin:koin-ktor:$koin_version")
+    implementation( "io.insert-koin:koin-logger-slf4j:$koin_version")
 
     // database
     implementation("org.postgresql:postgresql:$postgres_version")

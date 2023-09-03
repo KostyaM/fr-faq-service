@@ -1,13 +1,12 @@
 package faq.fastreport.ru.faq.data
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 
-class YamlTreeDataSource {
+class YamlTreeDataSource(
+    private val mapper: ObjectMapper
+) {
     val testRead = """
          root:
           100,Технический вопрос:
@@ -33,16 +32,14 @@ class YamlTreeDataSource {
               в рамках активной подписки со скидкой 20%.
     """.trimIndent()
 
-    fun loadFromFile() {
-        val mapper = ObjectMapper(YAMLFactory())
-        mapper.registerModule(KotlinModule.Builder().build())
-
-
+    private val _nodeMap: HashMap<Int, AnswerNodeDto> by lazy {
         val root = mapper.readTree(testRead).fields().next()
         val nodeMap = hashMapOf<Int, AnswerNodeDto>()
         readNode(mapper, 0, null, root.value, nodeMap)
-        println(nodeMap)
+        nodeMap
     }
+
+    fun getNodeMap() = _nodeMap
 
     private fun readNode(
         mapper: ObjectMapper,
