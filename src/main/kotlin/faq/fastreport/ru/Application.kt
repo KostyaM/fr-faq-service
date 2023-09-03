@@ -1,5 +1,6 @@
 package faq.fastreport.ru
 
+import faq.fastreport.ru.faq.data.YamlTreeDataSource
 import faq.fastreport.ru.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -19,4 +20,5 @@ fun main() {
 fun Application.module() {
     configureSecurity()
     configureRouting()
+    YamlTreeDataSource().loadFromFile()
 }
