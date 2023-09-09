@@ -3,9 +3,11 @@ package faq.fastreport.ru.faq.data
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
+import java.util.logging.Logger
 
 class YamlTreeDataSource(
-    private val mapper: ObjectMapper
+    private val faqTreeDatabaseSource: FaqTreeDatabaseSource,
+    private val yamlMapper: ObjectMapper
 ) {
     val testRead = """
          root:
@@ -32,23 +34,28 @@ class YamlTreeDataSource(
               в рамках активной подписки со скидкой 20%.
     """.trimIndent()
 
-    private val _nodeMap: HashMap<Int, AnswerNodeDto> by lazy {
-        val root = mapper.readTree(testRead).fields().next()
-        val nodeMap = hashMapOf<Int, AnswerNodeDto>()
-        readNode(mapper, 0, null, root.value, nodeMap)
-        nodeMap
+    fun initialize() {
+        val nodesSet = hashSetOf<AnswerNodeDto>()
+        try {
+            val root = yamlMapper.readTree(testRead).fields().next()
+            readNode(yamlMapper, null, 0, null, root.value, nodesSet)
+            println("Initialization from yaml: found ${nodesSet.size} new nodes")
+            val inserted = faqTreeDatabaseSource.insertNodes(nodesSet.toList())
+            println("Initialization success: Inserted ${inserted.size} new nodes")
+        } catch (t: Throwable) {
+            println("Failed to initialize with data: ${t.stackTrace}")
+            // TODO normal logging
+        }
     }
-
-    fun getNodeMap() = _nodeMap
 
     private fun readNode(
         mapper: ObjectMapper,
+        parentNodeId: Int?,
         nodeId: Int,
         nodeText: String?,
         node: JsonNode,
-        answerNodes: HashMap<Int, AnswerNodeDto>
+        answerNodes: HashSet<AnswerNodeDto>
     ) {
-        val childrenIds = mutableListOf<Int>()
         when {
             node.isTextual -> Unit
 
@@ -60,38 +67,46 @@ class YamlTreeDataSource(
                     if (arrayItem.isTextual) {
                         val arrayItemAsNode = mapper.readTree(arrayItem.asText())
                         val (childNodeId, childNodeName) = keyToIdValuePair(arrayItemAsNode.asText())
-                        childrenIds.add(childNodeId)
-                        readNode(mapper, childNodeId, childNodeName, arrayItemAsNode, answerNodes)
+                        readNode(
+                            mapper = mapper,
+                            parentNodeId = nodeId,
+                            nodeId = childNodeId,
+                            nodeText = childNodeName,
+                            node = arrayItemAsNode,
+                            answerNodes = answerNodes
+                        )
                     } else {
-                        parseInnerNode(mapper, arrayItem, childrenIds, answerNodes)
+                        parseInnerNode(mapper, parentNodeId, arrayItem, answerNodes)
                     }
                 }
             }
 
             else -> {
-                parseInnerNode(mapper, node, childrenIds, answerNodes)
+                parseInnerNode(mapper, parentNodeId, node, answerNodes)
             }
         }
-        answerNodes[nodeId] = AnswerNodeDto(
-            id = nodeId,
-            text = nodeText,
-            childrenIds = childrenIds
+        answerNodes.add(
+            AnswerNodeDto(
+                id = nodeId,
+                optionText = nodeText,
+                parentId = parentNodeId
+            )
         )
     }
 
     private fun parseInnerNode(
         mapper: ObjectMapper,
+        parentNodeId: Int?,
         node: JsonNode,
-        childrenIds: MutableList<Int>,
-        answerNodes: HashMap<Int, AnswerNodeDto>
+        answerNodes: HashSet<AnswerNodeDto>
     ) {
         val childrenIterator = node.fields()
         while (childrenIterator.hasNext()) {
             val child = childrenIterator.next()
             val (childNodeId, childNodeName) = keyToIdValuePair(child.key)
-            childrenIds.add(childNodeId)
             readNode(
                 mapper = mapper,
+                parentNodeId = parentNodeId,
                 nodeId = childNodeId,
                 nodeText = childNodeName,
                 node = child.value,

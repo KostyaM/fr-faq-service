@@ -23,10 +23,17 @@ fun main() {
 
 
 fun Application.module() {
-    install(Koin) {
-        modules(appModule)
-    }
+    install(Koin) { modules(appModule) }
+
+    // Заполняем БД данными из yaml файла
+    log.info("Starting server initialization from yaml file")
+    val yamlTreeDataSource by inject<YamlTreeDataSource>()
+    yamlTreeDataSource.initialize()
+
     configureSecurity()
+
+    // Роутинг /faq
     val faqRouting by inject<FaqRouting>()
     faqRouting.configure(this)
+    log.info("Configured and ready!")
 }

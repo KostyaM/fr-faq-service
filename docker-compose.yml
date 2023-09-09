@@ -15,7 +15,7 @@ services:
   db:
     build:
       context: ./Docker
-      dockerfile: db.Dockerfile
+      dockerfile: Docker/db/db.Dockerfile
     platform: linux/amd64
     restart: always
     container_name: fr-faq-db

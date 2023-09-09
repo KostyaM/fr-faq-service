@@ -1,7 +1,18 @@
 package faq.fastreport.ru.faq.data
 
-data class AnswerNodeDto(
+class AnswerNodeDto(
     val id: Int,
-    val text: String?,
-    val childrenIds: List<Int>
-)
+    val optionText: String?,
+    val parentId: Int?
+) {
+    override fun hashCode(): Int {
+        return id
+    }
+
+    override fun equals(other: Any?): Boolean {
+        val otherAnswer = other as? AnswerNodeDto ?: return false
+        return this.id == other.id &&
+                this.optionText == other.optionText &&
+                this.parentId == other.parentId
+    }
+}
