@@ -18,7 +18,7 @@ suspend fun <T> PipelineContext<Unit, ApplicationCall>.safeResponse(
     } catch (t: Throwable) {
         BasicResponse(
             state = STATE_ERROR,
-            data = block(),
+            data = null,
             errorMessage = t.localizedMessage
         )
     }

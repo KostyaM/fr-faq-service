@@ -3,12 +3,13 @@ package faq.fastreport.ru
 import faq.fastreport.ru.di.appModule
 import faq.fastreport.ru.faq.data.YamlTreeDataSource
 import faq.fastreport.ru.faq.routing.FaqRouting
-import faq.fastreport.ru.plugins.*
+import faq.fastreport.ru.plugins.configureSecurity
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
+import java.lang.RuntimeException
 
 fun main() {
     val env = applicationEngineEnvironment {
@@ -29,8 +30,6 @@ fun Application.module() {
     log.info("Starting server initialization from yaml file")
     val yamlTreeDataSource by inject<YamlTreeDataSource>()
     yamlTreeDataSource.initialize()
-
-    configureSecurity()
 
     // Роутинг /faq
     val faqRouting by inject<FaqRouting>()

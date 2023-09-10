@@ -14,14 +14,18 @@ class FaqRouting(
 
     fun configure(application: Application) = with(application) {
         routing {
-            get("/faq/{id}") { getById() }
+            get("/faq") {
+                getById(0)
+            }
+            get("/faq/{id}") {
+                val parentId = call.parameters["id"]?.toInt() ?: 0
+                getById(parentId)
+            }
         }
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.getById() = safeResponse(jsonMapper) {
-        val parentId = call.parameters["id"]?.toInt() ?: 0
+    private suspend fun PipelineContext<Unit, ApplicationCall>.getById(parentId: Int) = safeResponse(jsonMapper) {
         println("getById parentId: $parentId")
         faqTreeDatabaseSource.getChildren(parentId)
     }
-
 }

@@ -14,8 +14,8 @@ services:
         condition: service_healthy
   db:
     build:
-      context: ./Docker
-      dockerfile: Docker/db/db.Dockerfile
+      context: ./Docker/db/
+      dockerfile: db.Dockerfile
     platform: linux/amd64
     restart: always
     container_name: fr-faq-db

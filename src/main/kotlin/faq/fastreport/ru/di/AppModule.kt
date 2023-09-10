@@ -11,29 +11,34 @@ import io.ktor.server.application.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.ktorm.database.Database
+import org.ktorm.database.SqlDialect
+
+
+private val YamlSerializer = named("yaml")
+private val JsonSerializer = named("json")
 
 val appModule = module {
 
     /* Слой конфигурации */
     single {
         Database.connect(
-            url = "jdbc:postgresql://localhost:5432/postgres",
+            url = "jdbc:postgresql://db:5432/fr_faq_db",
             driver = "org.postgresql.Driver",
             user = "frFaqService",
             password = "yc6t23746ch7t436x"
         )
     }
 
-    single(YamlSerializer) {
-        val mapper = ObjectMapper(YAMLFactory())
-        mapper.registerModule(KotlinModule.Builder().build())
-        mapper
+    single<ObjectMapper>(YamlSerializer) {
+        ObjectMapper(YAMLFactory()).apply {
+            registerModule(KotlinModule.Builder().build())
+        }
     }
 
-    single(JsonSerializer) {
-        val mapper = ObjectMapper(JsonFactory())
-        mapper.registerModule(KotlinModule.Builder().build())
-        mapper
+    single<ObjectMapper>(JsonSerializer) {
+        ObjectMapper(JsonFactory()).apply {
+            registerModule(KotlinModule.Builder().build())
+        }
     }
 
     /* Слой данных (Data) */
@@ -55,6 +60,3 @@ val appModule = module {
         )
     }
 }
-
-private val YamlSerializer = named("yaml")
-private val JsonSerializer = named("yaml")
