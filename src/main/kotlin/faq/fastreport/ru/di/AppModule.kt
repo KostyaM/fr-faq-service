@@ -7,6 +7,9 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import faq.fastreport.ru.faq.data.FaqTreeDatabaseSource
 import faq.fastreport.ru.faq.data.YamlTreeDataSource
 import faq.fastreport.ru.faq.routing.FaqRouting
+import faq.fastreport.ru.session.data.UserSessionsDataSource
+import faq.fastreport.ru.session.domain.SessionCreationUseCase
+import faq.fastreport.ru.session.routing.SessionRouting
 import io.ktor.server.application.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -50,13 +53,29 @@ fun appModule(application: Application) = module {
             yamlMapper = get(YamlSerializer)
         )
     }
+    single { UserSessionsDataSource(get()) }
+
+    /*  Domain  */
+
+    single { SessionCreationUseCase(application, get()) }
 
     /* Слой роутинга (Presentation) */
 
     single<FaqRouting> {
         FaqRouting(
             faqTreeDatabaseSource = get(),
-            jsonMapper = get(JsonSerializer)
+            jsonMapper = get(JsonSerializer),
+            application = application,
+            userSessionsDataSource = get()
+        )
+    }
+
+    single {
+        SessionRouting(
+            application = application,
+            jsonMapper = get(JsonSerializer),
+            sessionCreationUseCase = get(),
+            userSessionsDataSource = get()
         )
     }
 }

@@ -48,11 +48,9 @@ dependencies {
     implementation("org.ktorm:ktorm-core:$ktorm_version")
     implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")
 
-    implementation("org.flywaydb:flyway-core:9.17.0")
-
     // Auth
-    implementation("io.ktor:ktor-server-auth-jvm")
-    implementation("io.ktor:ktor-server-auth-jwt-jvm")
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")

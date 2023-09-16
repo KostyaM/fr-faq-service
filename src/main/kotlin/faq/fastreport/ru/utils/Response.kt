@@ -1,6 +1,7 @@
 package faq.fastreport.ru.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
@@ -9,22 +10,21 @@ suspend fun <T> PipelineContext<Unit, ApplicationCall>.safeResponse(
     objectMapper: ObjectMapper,
     block: () -> T
 ) {
-    val response = try {
+    val (response, statusCode) = try {
         BasicResponse(
             state = STATE_OK,
             data = block(),
             errorMessage = null
-        )
+        ) to HttpStatusCode.OK
     } catch (t: Throwable) {
         BasicResponse(
             state = STATE_ERROR,
             data = null,
             errorMessage = t.localizedMessage
-        )
+        ) to HttpStatusCode.InternalServerError
     }
     val serialized = objectMapper.writeValueAsString(response)
-    println("Responding with: $serialized")
-    call.respondText(serialized)
+    call.respondText(serialized, ContentType.Application.Json, statusCode)
 }
 
 class BasicResponse<T>(
@@ -35,3 +35,4 @@ class BasicResponse<T>(
 
 const val STATE_OK = 0
 const val STATE_ERROR = -1
+const val STATE_NOT_AUTHORIZED = 401

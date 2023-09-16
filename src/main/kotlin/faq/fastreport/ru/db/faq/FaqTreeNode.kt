@@ -1,13 +1,10 @@
 package faq.fastreport.ru.db.faq
 
 
-import faq.fastreport.ru.db.faq.FaqTreeNodes.bindTo
-import faq.fastreport.ru.db.intArray
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.text
-import org.ktorm.support.postgresql.textArray
 
 interface FaqTreeNode : Entity<FaqTreeNode> {
     companion object : Entity.Factory<FaqTreeNode>()

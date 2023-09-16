@@ -27,6 +27,18 @@ class FaqTreeDatabaseSource(private val database: Database) {
                     parentId = row[FaqTreeNodes.parentId]
                 )
             }
+    }
 
+    fun getNodeChain(nodeIds: List<Int>): List<AnswerNodeDto> {
+        return database.from(FaqTreeNodes).select()
+            .where { FaqTreeNodes.id inList nodeIds }
+            .orderBy(FaqTreeNodes.id.asc())
+            .map { row ->
+                AnswerNodeDto(
+                    id = row[FaqTreeNodes.id]!!,
+                    optionText = row[FaqTreeNodes.optionText],
+                    parentId = row[FaqTreeNodes.parentId]
+                )
+            }
     }
 }
