@@ -10,39 +10,12 @@ class YamlTreeDataSource(
     private val faqTreeDatabaseSource: FaqTreeDatabaseSource,
     private val yamlMapper: ObjectMapper
 ) {
-    val testRead = """
-         root:
-          100,Технический вопрос:
-            - 110,VCL
-            - 120,NET:
-                - 121,Какие отличия между редакциями в FastReport .NET?
-                - 122,Редакция Standard поставляется с минимальной функциональностью, без исходного кода и онлайн-дизайнера для редактирования отчетов в веб; <br/> Редакция Professional поставляется с исходным кодом;<br/>Редакция Enterprise поставляется с исходным кодом и онлайн дизайнером для редактирования отчетов в веб-интерфейсе.
-            - 130,Cross-platform
-            - 140,Services
-          200,Вопрос по способам оплаты:
-            - 210,Оплата физ. лцом:
-                - 211,Можно оплатить картой
-            - 220,Оплата юр. лицом:
-                - 221,Необходимо выставить счёт
-          300,Вопросы лицензирования:
-            - 310,Я могу протестировать продукт перед покупкой? Вы оказываете техническую поддержку при тестировании?
-                - 311,Да, конечно, мы рекомендуем протестировать наш программный продукт перед покупкой, чтобы убедиться, что он соответствует вашим требованиям. Пробная версия включает в себя все функциональные возможности полной версии, но имеет ряд ограничений. Наши специалисты будут рады помочь вам. Вы можете отправить нам технические вопросы на support@fastreport.ru.
-            - 320,У меня есть идея, которая может улучшить ваш продукт. Могу ли я поделиться своими мыслями?
-                - 321, Мы всегда рады узнать, что нужно нашим клиентам. Наша компания всегда открыта для новых идей и предложений. У нас есть специальный список задач (to-do list). В него мы включаем функционал, который должен быть реализован как можно быстрее. Вполне вероятно, ваша идея также окажется интересной и будет включена в него.
-            - 330,Я хотел бы перейти с лицензии Single до Team.. Сколько это будет стоит?
-              - >
-             - 331,Переход от Single лицензии до Team возможен
-              в рамках активной подписки со скидкой 20%.
-    """.trimIndent()
-
-    fun initialize() {
+    fun initialize(pathToYaml: String) {
         val nodesSet = hashSetOf<AnswerNodeDto>()
         try {
-            val root = yamlMapper.readTree(testRead).fields().next()
+            val root = yamlMapper.readTree(File(pathToYaml)).fields().next()
             readNode(yamlMapper, 0, 0, null, root.value, nodesSet)
-            println("Initialization from yaml: found ${nodesSet.size} new nodes")
             val inserted = faqTreeDatabaseSource.insertNodes(nodesSet.toList())
-            println("Initialization success: Inserted ${inserted.size} new nodes")
         } catch (t: Throwable) {
             t.printStackTrace()
             println("Failed to initialize with data: ${t.stackTrace}")

@@ -17,15 +17,15 @@ import org.ktorm.database.SqlDialect
 private val YamlSerializer = named("yaml")
 private val JsonSerializer = named("json")
 
-val appModule = module {
+fun appModule(application: Application) = module {
 
     /* Слой конфигурации */
     single {
         Database.connect(
-            url = "jdbc:postgresql://host.docker.internal:5432/fr_faq_db?user=frFaqService",
+            url = "jdbc:postgresql://host.docker.internal:5432/fr_faq_db",
             driver = "org.postgresql.Driver",
-            user = "frFaqService",
-            password = "yc6t23746ch7t436x"
+            user = application.environment.config.property("database.databaseUser").getString(),
+            password = application.environment.config.property("database.postgresPassword").getString()
         )
     }
 
