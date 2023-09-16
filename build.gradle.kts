@@ -48,6 +48,8 @@ dependencies {
     implementation("org.ktorm:ktorm-core:$ktorm_version")
     implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")
 
+    implementation("org.flywaydb:flyway-core:9.17.0")
+
     // Auth
     implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
@@ -59,4 +61,11 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+}
+
+tasks.register<JavaExec>("migrate") {
+    group = "Execution"
+    description = "Migrates the database to the latest version"
+    classpath = sourceSets.getByName("main").runtimeClasspath
+    mainClass.set("faq.fastreport.ru.db.RunMigration")
 }

@@ -22,7 +22,7 @@ val appModule = module {
     /* Слой конфигурации */
     single {
         Database.connect(
-            url = "jdbc:postgresql://db:5432/fr_faq_db",
+            url = "jdbc:postgresql://host.docker.internal:5432/fr_faq_db?user=frFaqService",
             driver = "org.postgresql.Driver",
             user = "frFaqService",
             password = "yc6t23746ch7t436x"

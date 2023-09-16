@@ -19,6 +19,6 @@ interface FaqTreeNode : Entity<FaqTreeNode> {
 
 object FaqTreeNodes : Table<FaqTreeNode>("faq_tree_node") {
     val id = int("id").primaryKey().bindTo(FaqTreeNode::id)
-    val optionText = text("optionText").bindTo(FaqTreeNode::optionText)
-    val parentId = int("parentId").bindTo(FaqTreeNode::parentId)
+    val optionText = text("option_text").bindTo(FaqTreeNode::optionText)
+    val parentId = int("parent_id").bindTo(FaqTreeNode::parentId)
 }

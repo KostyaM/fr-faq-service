@@ -3,6 +3,7 @@ package faq.fastreport.ru.faq.data
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
+import java.io.File
 import java.util.logging.Logger
 
 class YamlTreeDataSource(
@@ -38,11 +39,12 @@ class YamlTreeDataSource(
         val nodesSet = hashSetOf<AnswerNodeDto>()
         try {
             val root = yamlMapper.readTree(testRead).fields().next()
-            readNode(yamlMapper, null, 0, null, root.value, nodesSet)
+            readNode(yamlMapper, 0, 0, null, root.value, nodesSet)
             println("Initialization from yaml: found ${nodesSet.size} new nodes")
             val inserted = faqTreeDatabaseSource.insertNodes(nodesSet.toList())
             println("Initialization success: Inserted ${inserted.size} new nodes")
         } catch (t: Throwable) {
+            t.printStackTrace()
             println("Failed to initialize with data: ${t.stackTrace}")
             // TODO normal logging
         }
@@ -76,22 +78,25 @@ class YamlTreeDataSource(
                             answerNodes = answerNodes
                         )
                     } else {
-                        parseInnerNode(mapper, parentNodeId, arrayItem, answerNodes)
+                        parseInnerNode(mapper, nodeId, arrayItem, answerNodes)
                     }
                 }
             }
 
             else -> {
-                parseInnerNode(mapper, parentNodeId, node, answerNodes)
+                parseInnerNode(mapper, nodeId, node, answerNodes)
             }
         }
-        answerNodes.add(
-            AnswerNodeDto(
-                id = nodeId,
-                optionText = nodeText,
-                parentId = parentNodeId
+        // Самый первый узел пропускаем
+        if (nodeId != 0) {
+            answerNodes.add(
+                AnswerNodeDto(
+                    id = nodeId,
+                    optionText = nodeText,
+                    parentId = parentNodeId
+                )
             )
-        )
+        }
     }
 
     private fun parseInnerNode(
