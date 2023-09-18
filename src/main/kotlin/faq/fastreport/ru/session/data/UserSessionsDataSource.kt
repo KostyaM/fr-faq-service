@@ -18,7 +18,7 @@ class UserSessionsDataSource(private val database: Database) {
     fun createSession(userSession: UserSessionDto) {
         database.insert(UserSessions) {
             set(UserSessions.userId, userSession.userId)
-            set(UserSessions.stage, userSession.stages.toIntArray())
+            set(UserSessions.stage, userSession.stages.toTypedArray())
         }
     }
 
@@ -30,14 +30,14 @@ class UserSessionsDataSource(private val database: Database) {
                 UserSessionDto(
                     id = row[UserSessions.id],
                     userId = userId,
-                    stages = row[UserSessions.stage]?.toList() ?: listOf(0)
+                    stages = row[UserSessions.stage]?.mapNotNull { it } ?: emptyList()
                 )
             }.firstOrNull()
     }
 
     fun setStages(userId: UUID, stages: List<Int>) {
         database.update(UserSessions) {
-            set(UserSessions.stage, stages.toIntArray())
+            set(UserSessions.stage, stages.toTypedArray())
             where { UserSessions.userId eq userId }
         }
     }

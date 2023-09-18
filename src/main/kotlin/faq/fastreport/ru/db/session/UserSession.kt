@@ -6,6 +6,7 @@ import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.long
 import org.ktorm.schema.uuid
+import org.ktorm.support.postgresql.textArray
 import java.util.*
 
 /**
@@ -18,7 +19,7 @@ interface UserSession : Entity<UserSession> {
 
     val id: Long
     val userId: UUID
-    val stage: IntArray?
+    val stage: Array<Int?>?
 }
 
 object UserSessions : Table<UserSession>("user_session") {
